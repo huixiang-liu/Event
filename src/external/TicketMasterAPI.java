@@ -15,8 +15,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import entity.Item;
 import entity.Item.ItemBuilder;
+import entity.TickerMasterObject;
 
 
 public class TicketMasterAPI {
@@ -65,9 +68,17 @@ public class TicketMasterAPI {
 			JSONObject obj = new JSONObject(response.toString());
 			
 			if (!obj.isNull("_embedded")) {
-				JSONObject embedded = obj.getJSONObject("_embedded");
-				return getItemList(embedded.getJSONArray("events"));
-			}
+			    JSONObject embedded = obj.getJSONObject("_embedded");
+			    for (int i = 0; i < embedded.getJSONArray("events").length(); ++i) {
+			       JSONObject event = embedded.getJSONArray("events").getJSONObject(i);
+			       ObjectMapper objectMapper = new ObjectMapper();
+			       TickerMasterObject objs = objectMapper.readValue(event.toString(), TickerMasterObject.class);
+			       
+			       // build Item object from the TickerMasterObject instance 
+			    }
+			    return getItemList(embedded.getJSONArray("events"));
+			  }
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
